@@ -14,7 +14,7 @@
 
 > Mustafa Muhammad Abdulhammed
 
-> 📎🎓 Instructor : Aboubakr Yousre
+> 📎🎓 Instructor : Abobakr Yousre
 
 > 🎯 Project Objectives:
 
