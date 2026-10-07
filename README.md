@@ -2,6 +2,7 @@
 
 > 📌 Project Overview: A microservices-based inventory platform featuring real-time tracking and alerting, deployed on cloud infrastructure through a fully automated DevOps pipeline utilizing Docker, Kubernetes, Jenkins CI/CD, Terraform, Ansible, and Prometheus.
 
+
 > 👥 Team Members:
 
 Omar Mohamed Abdelkader
@@ -14,40 +15,42 @@ Yousef Ahmed Sayed
 
 Mustafa Muhammad Abdulhammed
 
+
 > 📎🎓 Instructor : Abobakr Yousre
+
+
 
 > 🎯 Project Objectives:
 
-Infrastructure as Code: Automate cloud provisioning (compute, network, storage) using Terraform.
+Containerization: Package the inventory backend, alert service, and web dashboard into production-ready Docker containers.
 
-Configuration Management: Standardize host environments and runtime dependencies using Ansible.
+Infrastructure Automation (IaC): Automate AWS provisioning (VPC, EC2, S3) using Terraform, and host configuration using Ansible.
 
-Containerization & Orchestration: Package services into Docker containers and manage high availability and autoscaling with Kubernetes.
+Kubernetes Orchestration: Deploy services on a Kubernetes cluster with self-healing, rolling updates, and Nginx ingress routing.
 
-Automated CI/CD: Build an end-to-end Jenkins pipeline for automated testing, image builds, and zero-downtime cluster rollouts.
+Continuous Delivery (CI/CD): Build a declarative Jenkins pipeline to automate code testing, image building, and cluster deployment.
 
-Observability & Routing: Route traffic securely with Nginx and monitor cluster health and metrics using Prometheus & Grafana.
+System Observability: Implement Prometheus and Grafana for real-time cluster, container, and application metric monitoring.
+
 
 > 📦 Project Scope :
 
 > In-Scope:
 
-Containerizing the inventory dashboard (UI, API, and database).
+Application: Real-time stock tracking service, automated low-stock alerting logic, and an Nginx-backed web management UI.
 
-Cloud infrastructure provisioning via Terraform and server setup via Ansible.
+IaC & Config: Terraform scripts for AWS cloud networking/compute; Ansible playbooks for server bootstrapping and runtime setup.
 
-Kubernetes manifests for deployments, services, ingress routing, and scaling.
+DevOps Lifecycle: Git version control, Jenkins multi-stage CI/CD pipeline, Docker container builds, and Kubernetes workload management.
 
-Automated Jenkins CI/CD pipeline from Git push to production deployment.
-
-Real-time monitoring dashboards and alerting via Prometheus and Grafana.
+Monitoring: Prometheus scrapers and Grafana dashboards for performance and availability tracking.
 
 > Out-of-Scope:
 
-Native mobile apps (iOS/Android) — limited to a responsive web interface.
+AI/ML predictive analytics or demand forecasting.
 
-Third-party enterprise ERP integrations (e.g., SAP, Oracle).
+Multi-region cloud failover setups.
 
-Complex machine learning demand-forecasting models.
+Payment gateways, physical POS hardware, or third-party ERP integrations.
 
 > 📅 Project Plan (5 Weeks)
