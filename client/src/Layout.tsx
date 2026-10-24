@@ -1,4 +1,4 @@
-import React, { type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import NavBar from '@/components/navbar/NavBar';
 import { Box } from '@mui/material';
 import Footer from './components/footer/Footer';

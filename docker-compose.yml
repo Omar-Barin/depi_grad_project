@@ -1,0 +1,110 @@
+name: smart-inventory-system
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: inventory-db
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-inventory_management}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-inventory_management}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - inventory-net
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: inventory-server
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+    ports:
+      - "8000:8000"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      DB_NAME: ${POSTGRES_DB:-inventory_management}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - inventory-net
+
+  alert-service:
+    build:
+      context: ./alert-service
+      dockerfile: Dockerfile
+    container_name: inventory-alert
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    ports:
+      - "8001:8001"
+    environment:
+      BACKEND_URL: http://server:8000
+      CHECK_INTERVAL: 15
+      LOW_STOCK_THRESHOLD: 10
+    depends_on:
+      server:
+        condition: service_healthy
+    networks:
+      - inventory-net
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:8000
+    container_name: inventory-client
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+    ports:
+      - "3000:80"
+      - "5173:80"
+    depends_on:
+      - server
+    networks:
+      - inventory-net
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  inventory-net:
+    driver: bridge

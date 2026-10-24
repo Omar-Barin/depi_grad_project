@@ -9,7 +9,11 @@ function ProductForm() {
         dispatch(editField({ name, value }));
     };
     const submitForm = () => {
-        isUpdate ? dispatch(updateProduct({id: product.id!, product}) ) : dispatch(createProduct(product));
+        if (isUpdate && product.id != null) {
+            dispatch(updateProduct({ id: product.id, product }));
+        } else {
+            dispatch(createProduct(product));
+        }
     };
 
     return (
