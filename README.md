@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# inventory-management
-a simple inventory management system using react, fastapi and postgres
-=======
 > 📎 Project Name : Smart Inventory Management System
 
 > 📌 Project Overview: A microservices-based inventory platform featuring real-time tracking and alerting, deployed on cloud infrastructure through a fully automated DevOps pipeline utilizing Docker, Kubernetes, Jenkins CI/CD, Terraform, Ansible, and Prometheus.
@@ -58,4 +54,3 @@ Multi-region cloud failover setups.
 Payment gateways, physical POS hardware, or third-party ERP integrations.
 
 > 📅 Project Plan (5 Weeks)
->>>>>>> e39fd982f62977fd5bf9ce56e4056c142b892ed8
