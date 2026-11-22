@@ -7,6 +7,7 @@ from typing import Any, Dict, List
 import requests
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from prometheus_fastapi_instrumentator import Instrumentator
 
 # Configure logging
 logging.basicConfig(
@@ -96,6 +97,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Instrument Prometheus metrics endpoint at /metrics
+Instrumentator().instrument(app).expose(app)
 
 @app.get("/")
 def root():
