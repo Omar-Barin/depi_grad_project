@@ -6,6 +6,7 @@ from models.models import Product
 from sqlalchemy.orm import Session
 
 from contextlib import asynccontextmanager
+from prometheus_fastapi_instrumentator import Instrumentator
 
 def seed_initial_data():
     try:
@@ -42,6 +43,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Instrument Prometheus metrics endpoint at /metrics
+Instrumentator().instrument(app).expose(app)
 
 @app.get("/")
 def greet():
