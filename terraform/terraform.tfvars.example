@@ -1,0 +1,9 @@
+# Example configuration values for Terraform
+# Copy to terraform.tfvars or pass as CLI arguments
+
+aws_region         = "us-east-1"
+project_name       = "smart-inventory"
+environment        = "dev"
+instance_type      = "t2.micro"
+s3_bucket_name     = "smart-inventory-storage-depi-2026"
+key_name           = ""
