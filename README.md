@@ -16,7 +16,7 @@ Yousef Ahmed Sayed
 Mustafa Muhammad Abdulhammed
 
 
-> 📎🎓 Instructor : Abobakr Yousre
+> 📎🎓 Instructor : Mohamed Rahim
 
 
 
