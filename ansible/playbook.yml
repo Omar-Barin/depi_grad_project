@@ -1,0 +1,157 @@
+---
+- name: Bootstrap and Configure Smart Inventory Management Server
+  hosts: app_servers
+  become: true
+  vars:
+    required_packages:
+      - curl
+      - wget
+      - git
+      - ufw
+      - apt-transport-https
+      - ca-certificates
+      - gnupg
+      - lsb-release
+      - gettext-base
+      - htop
+      - jq
+    exposed_ports:
+      - { port: "22", proto: "tcp", comment: "SSH" }
+      - { port: "80", proto: "tcp", comment: "HTTP" }
+      - { port: "443", proto: "tcp", comment: "HTTPS" }
+      - { port: "3000", proto: "tcp", comment: "Frontend" }
+      - { port: "8000", proto: "tcp", comment: "Backend API" }
+      - { port: "8001", proto: "tcp", comment: "Alert Service" }
+      - { port: "9090", proto: "tcp", comment: "Prometheus" }
+      - { port: "3001", proto: "tcp", comment: "Grafana" }
+      - { port: "6443", proto: "tcp", comment: "K3s API" }
+
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install required packages
+      ansible.builtin.apt:
+        name: "{{ required_packages }}"
+        state: present
+
+    - name: Set UFW default incoming policy to deny
+      ansible.builtin.ufw:
+        direction: incoming
+        policy: deny
+
+    - name: Set UFW default outgoing policy to allow
+      ansible.builtin.ufw:
+        direction: outgoing
+        policy: allow
+
+    - name: Allow required ports
+      ansible.builtin.ufw:
+        rule: allow
+        port: "{{ item.port }}"
+        proto: "{{ item.proto }}"
+        comment: "{{ item.comment }}"
+      loop: "{{ exposed_ports }}"
+
+    - name: Enable UFW
+      ansible.builtin.ufw:
+        state: enabled
+
+    - name: Create apt keyrings directory
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Download Docker GPG key
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: '0644'
+        force: false
+
+    - name: Add Docker apt repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch={{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+        filename: docker
+
+    - name: Install Docker and Compose plugin
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+        update_cache: true
+
+    - name: Enable and start Docker
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Add ubuntu user to docker group
+      ansible.builtin.user:
+        name: ubuntu
+        groups: docker
+        append: true
+
+    - name: Check if K3s is installed
+      ansible.builtin.stat:
+        path: /usr/local/bin/k3s
+      register: k3s_binary
+
+    - name: Install K3s
+      ansible.builtin.shell: |
+        curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--write-kubeconfig-mode 644" sh -
+      when: not k3s_binary.stat.exists
+
+    - name: Enable and start K3s
+      ansible.builtin.systemd:
+        name: k3s
+        state: started
+        enabled: true
+
+    - name: Create .kube directory
+      ansible.builtin.file:
+        path: /home/ubuntu/.kube
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+
+    - name: Copy K3s kubeconfig
+      ansible.builtin.copy:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: /home/ubuntu/.kube/config
+        remote_src: true
+        owner: ubuntu
+        group: ubuntu
+        mode: '0600'
+
+    - name: Add KUBECONFIG to .bashrc
+      ansible.builtin.lineinfile:
+        path: /home/ubuntu/.bashrc
+        line: 'export KUBECONFIG=~/.kube/config'
+        state: present
+
+    - name: Check Docker version
+      ansible.builtin.command: docker --version
+      register: docker_version_out
+      changed_when: false
+
+    - name: Check K3s nodes
+      ansible.builtin.command: kubectl get nodes
+      register: k8s_nodes_out
+      changed_when: false
+
+    - name: Print verification output
+      ansible.builtin.debug:
+        msg:
+          - "{{ docker_version_out.stdout }}"
+          - "{{ k8s_nodes_out.stdout_lines }}"
