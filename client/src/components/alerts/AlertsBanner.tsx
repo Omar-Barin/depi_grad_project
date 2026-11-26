@@ -35,7 +35,6 @@ export default function AlertsBanner({ refreshKey }: AlertsBannerProps) {
     }, [refreshKey]);
 
     const criticalCount = alerts.filter((a) => a.severity === 'CRITICAL').length;
-    const warningCount = alerts.filter((a) => a.severity === 'WARNING').length;
 
     if (alerts.length === 0) {
         return (

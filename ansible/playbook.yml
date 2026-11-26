@@ -24,6 +24,7 @@
       - { port: "8001", proto: "tcp", comment: "Alert Service" }
       - { port: "9090", proto: "tcp", comment: "Prometheus" }
       - { port: "3001", proto: "tcp", comment: "Grafana" }
+      - { port: "8080", proto: "tcp", comment: "Jenkins" }
       - { port: "6443", proto: "tcp", comment: "K3s API" }
 
   tasks:
@@ -140,6 +141,78 @@
         line: 'export KUBECONFIG=~/.kube/config'
         state: present
 
+    - name: Install Java 17 for Jenkins
+      ansible.builtin.apt:
+        name:
+          - fontconfig
+          - openjdk-17-jre
+        state: present
+
+    - name: Download Jenkins GPG key
+      ansible.builtin.get_url:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+        dest: /etc/apt/keyrings/jenkins-keyring.asc
+        mode: '0644'
+        force: false
+
+    - name: Add Jenkins apt repository
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
+        state: present
+        filename: jenkins
+
+    - name: Install Jenkins
+      ansible.builtin.apt:
+        name: jenkins
+        state: present
+        update_cache: true
+
+    - name: Add jenkins user to docker group
+      ansible.builtin.user:
+        name: jenkins
+        groups: docker
+        append: true
+      register: jenkins_docker_group
+
+    - name: Enable and start Jenkins
+      ansible.builtin.systemd:
+        name: jenkins
+        state: started
+        enabled: true
+
+    - name: Restart Jenkins to apply docker group
+      ansible.builtin.systemd:
+        name: jenkins
+        state: restarted
+      when: jenkins_docker_group.changed
+
+    - name: Create .kube directory for jenkins user
+      ansible.builtin.file:
+        path: /var/lib/jenkins/.kube
+        state: directory
+        owner: jenkins
+        group: jenkins
+        mode: '0755'
+
+    - name: Copy K3s kubeconfig for jenkins user
+      ansible.builtin.copy:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: /var/lib/jenkins/.kube/config
+        remote_src: true
+        owner: jenkins
+        group: jenkins
+        mode: '0600'
+
+    - name: Wait for Jenkins initial admin password
+      ansible.builtin.wait_for:
+        path: /var/lib/jenkins/secrets/initialAdminPassword
+        timeout: 60
+
+    - name: Read Jenkins initial admin password
+      ansible.builtin.slurp:
+        src: /var/lib/jenkins/secrets/initialAdminPassword
+      register: jenkins_init_pass
+
     - name: Check Docker version
       ansible.builtin.command: docker --version
       register: docker_version_out
@@ -155,3 +228,4 @@
         msg:
           - "{{ docker_version_out.stdout }}"
           - "{{ k8s_nodes_out.stdout_lines }}"
+          - "Jenkins Initial Admin Password: {{ jenkins_init_pass.content | b64decode | trim }}"
