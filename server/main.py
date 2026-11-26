@@ -1,16 +1,18 @@
+import time
+from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from models import db_models
 from dbconfig import engine, session
 from models.models import Product
+from sqlalchemy import text
 from sqlalchemy.orm import Session
-
-from contextlib import asynccontextmanager
 from prometheus_fastapi_instrumentator import Instrumentator
 
 def seed_initial_data():
+    db = session()
     try:
-        db = session()
+        db.execute(text("SELECT pg_advisory_xact_lock(1)"))
         if db.query(db_models.Product).count() == 0:
             demo_products = [
                 db_models.Product(name="Smartphone", description="Latest generation smartphone", price=699.99, quantity=25),
@@ -22,17 +24,21 @@ def seed_initial_data():
             db.add_all(demo_products)
             db.commit()
             print("Successfully seeded initial inventory data.")
+    finally:
         db.close()
-    except Exception as e:
-        print(f"Database seed note: {e}")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    try:
-        db_models.Base.metadata.create_all(bind=engine)
-        seed_initial_data()
-    except Exception as e:
-        print(f"Database connection note: {e}")
+    for attempt in range(1, 16):
+        try:
+            db_models.Base.metadata.create_all(bind=engine)
+            seed_initial_data()
+            break
+        except Exception as e:
+            print(f"Database init attempt {attempt}/15 failed: {e}")
+            if attempt == 15:
+                raise
+            time.sleep(2)
     yield
 
 app = FastAPI(title="Inventory Management API", lifespan=lifespan)

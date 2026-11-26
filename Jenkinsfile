@@ -56,10 +56,12 @@ pipeline {
 
                         for f in k8s/*.yaml; do printf '\\n---\\n'; envsubst < "$f"; done | kubectl apply -f -
 
-                        kubectl rollout restart deployment/server deployment/alert-service deployment/client
+                        kubectl rollout status deployment/postgres --timeout=120s
+                        kubectl rollout restart deployment/server deployment/alert-service deployment/client deployment/grafana
                         kubectl rollout status deployment/server --timeout=120s
                         kubectl rollout status deployment/alert-service --timeout=120s
                         kubectl rollout status deployment/client --timeout=120s
+                        kubectl rollout status deployment/grafana --timeout=120s
                     '''
                 }
             }
