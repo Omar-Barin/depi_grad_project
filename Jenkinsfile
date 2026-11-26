@@ -47,12 +47,14 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'inventory-env', variable: 'ENV_FILE')]) {
                     sh '''
+                        tr -d '\\r' < "$ENV_FILE" > .env.tmp
                         set -a
-                        . "$ENV_FILE"
+                        . ./.env.tmp
                         set +a
+                        rm -f .env.tmp
                         export DOCKERHUB_USER="$DOCKERHUB_CREDS_USR"
 
-                        for f in k8s/*.yaml; do envsubst < "$f"; done | kubectl apply -f -
+                        for f in k8s/*.yaml; do printf '\\n---\\n'; envsubst < "$f"; done | kubectl apply -f -
 
                         kubectl rollout restart deployment/server deployment/alert-service deployment/client
                         kubectl rollout status deployment/server --timeout=120s
