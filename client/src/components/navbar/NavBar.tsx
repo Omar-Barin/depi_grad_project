@@ -3,8 +3,11 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import Chip from '@mui/material/Chip';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
+
+const APP_VERSION = 'v1.0.0';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -56,14 +59,25 @@ function NavBar() {
                     {/* <IconButton size="large" edge="start" color="inherit" aria-label="open drawer" sx={{ mr: 2 }}>
                         <MenuIcon />
                     </IconButton> */}
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component="div"
-                        sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-                    >
-                        Inventory Management
-                    </Typography>
+                    <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <Typography
+                            variant="h6"
+                            noWrap
+                            component="div"
+                            sx={{ display: { xs: 'none', sm: 'block' } }}
+                        >
+                            Inventory Management
+                        </Typography>
+                        <Chip
+                            label={APP_VERSION}
+                            size="small"
+                            sx={{
+                                bgcolor: 'rgba(255, 255, 255, 0.2)',
+                                color: 'inherit',
+                                fontWeight: 600,
+                            }}
+                        />
+                    </Box>
                     <Search>
                         <SearchIconWrapper>
                             <SearchIcon />
