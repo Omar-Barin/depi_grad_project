@@ -220,3 +220,7 @@ override.tf.json
 *_override.tf.json
 .terraformrc
 terraform.rc
+
+# SSH Private Keys
+*.pem
+*.key

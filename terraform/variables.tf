@@ -1,19 +1,19 @@
 variable "aws_region" {
   description = "AWS deployment region"
   type        = string
-  default     = "eu-central-1"
+  default     = "eu-north-1"
 }
 
 variable "ami_id" {
-  description = "Official Ubuntu 22.04 LTS AMI ID for eu-central-1 (Frankfurt)"
+  description = "Official Ubuntu 24.04 LTS AMI ID for eu-north-1 (Stockholm)"
   type        = string
-  default     = "ami-08c53f88461834e96"
+  default     = "ami-08e03b36885006906"
 }
 
 variable "instance_type" {
-  description = "EC2 instance size (Free Tier eligible: t2.micro)"
+  description = "EC2 instance size (Free tier eligible: m7i-flex.large)"
   type        = string
-  default     = "t3.large"
+  default     = "m7i-flex.large"
 }
 
 variable "key_name" {
