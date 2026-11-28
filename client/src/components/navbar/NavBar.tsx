@@ -7,7 +7,7 @@ import Chip from '@mui/material/Chip';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
 
-const APP_VERSION = 'v1.0.0';
+const APP_VERSION = 'v1.0.1';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
