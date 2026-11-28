@@ -198,15 +198,20 @@ data:
             },
             "overrides": []
           },
-          "gridPos": { "h": 4, "w": 24, "x": 0, "y": 1 },
+          "gridPos": { "h": 5, "w": 24, "x": 0, "y": 1 },
           "id": 2,
           "options": {
-            "colorMode": "value",
+            "colorMode": "background",
             "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "horizontal",
+            "justifyMode": "center",
+            "orientation": "vertical",
             "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-            "textMode": "auto"
+            "text": {
+              "titleSize": 16,
+              "valueSize": 36
+            },
+            "textMode": "value_and_name",
+            "wideLayout": false
           },
           "pluginVersion": "11.2.0",
           "targets": [
@@ -224,7 +229,7 @@ data:
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 6 },
           "id": 3,
           "title": "Microservices Traffic & Performance",
           "type": "row"
@@ -238,7 +243,7 @@ data:
             },
             "overrides": []
           },
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 7 },
           "id": 4,
           "targets": [
             {
@@ -260,7 +265,7 @@ data:
             },
             "overrides": []
           },
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 7 },
           "id": 5,
           "targets": [
             {
@@ -282,7 +287,7 @@ data:
             },
             "overrides": []
           },
-          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 14 },
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 15 },
           "id": 6,
           "targets": [
             {
